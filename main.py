@@ -68,7 +68,7 @@ def make_image(array: np.ndarray, directory: str) -> None:
 
 
 # running = True
-board_in_progress = read_file("plansza2.txt")
+board_in_progress = read_file("plansza3.txt")
 SOLVED = read_file("plansza.txt")
 
 # read all unused pieces
