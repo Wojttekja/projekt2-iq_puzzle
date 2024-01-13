@@ -1,5 +1,4 @@
 """Projekt WDI IQ puzzle - Wojciech Mierzejek 459435"""
-# Let's make this mf without pygame
 from math import ceil
 from itertools import chain
 import numpy as np
@@ -39,7 +38,7 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
     else:
         width = 3
     height = ceil(len(unused_pieces)/2)
-    print(height, width, [2]+[1]*(width-1), [1]*height)
+
     fig = plt.figure(figsize=(15, 10))
     gs = fig.add_gridspec(height, width, width_ratios=[2]+[1]*(width-1), height_ratios=[1]*height)
     colormap = ListedColormap(colors)
@@ -55,16 +54,23 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
 
     for board, plot in zip(unused_pieces, unused_plots):
         # add unused piece and make it specific color
-        plot.imshow(board, cmap=ListedColormap([colors[0]]+[colors[int(max(list(chain(*board.tolist()))))]]))
+        plot.imshow(board,
+                cmap=ListedColormap([colors[0]]+[colors[int(max(list(chain(*board.tolist()))))]]))
         plot.set_xticks([])
         plot.set_yticks([])
     plt.tight_layout()
     plt.show()
 
-board_in_progress = read_file("plansza2.txt")
-SOLVED = read_file("plansza.txt")
-ALL_PIECES = read_all_pieces_from_board(SOLVED)
-used = read_all_pieces_from_board(board_in_progress)
-unused = [i for i in ALL_PIECES if i not in used]
-print(board_in_progress)
-show(board_in_progress, [draw_an_element(i, SOLVED) for i in unused])
+
+def dopa
+
+# get input
+SOLVED_BOARD = read_file('plansza.txt')
+board_in_progress = read_file('plansza2.txt')
+
+# get basic info from input - all pieces, read how not placed pieces look like 
+ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
+PLACED = set(list(chain(*board_in_progress.tolist())))
+# pieces - list of np.ndarrays representing 
+pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
+
