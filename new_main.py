@@ -83,7 +83,7 @@ def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool o
     return new_board
 
 def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
-    
+    ...
 
 
 
