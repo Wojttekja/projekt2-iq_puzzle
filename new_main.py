@@ -34,7 +34,7 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
     """Shows in one windows main board and all the pieces"""
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
-    if len(unused_pieces) < 3:
+    if len(unused_pieces) < 2:
         width = len(unused_pieces) + 1
     else:
         width = 3
@@ -46,16 +46,22 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
 
     main_plot = fig.add_subplot(gs[0, 0])
     unused_plots = [fig.add_subplot(gs[i, j+1]) for i in range(height) for j in range(width-1)]
+
     main_plot.imshow(main_board, cmap=colormap)
     main_plot.set_title("Układana plansza")
-    print(unused)
+    # get rid of axes descriptions
+    main_plot.set_xticks([])
+    main_plot.set_yticks([])
+
     for board, plot in zip(unused_pieces, unused_plots):
-        print(colors[int(max(list(chain(*board.tolist()))))])
+        # add unused piece and make it specific color
         plot.imshow(board, cmap=ListedColormap([colors[0]]+[colors[int(max(list(chain(*board.tolist()))))]]))
+        plot.set_xticks([])
+        plot.set_yticks([])
     plt.tight_layout()
     plt.show()
 
-board_in_progress = read_file("plansza3.txt")
+board_in_progress = read_file("plansza2.txt")
 SOLVED = read_file("plansza.txt")
 ALL_PIECES = read_all_pieces_from_board(SOLVED)
 used = read_all_pieces_from_board(board_in_progress)
