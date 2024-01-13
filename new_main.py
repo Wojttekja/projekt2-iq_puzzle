@@ -54,23 +54,34 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
 
     for board, plot in zip(unused_pieces, unused_plots):
         # add unused piece and make it specific color
-        plot.imshow(board,
-                cmap=ListedColormap([colors[0]]+[colors[int(max(list(chain(*board.tolist()))))]]))
+        plot.imshow(board, cmap=ListedColormap([colors[0]]+[colors[int(board.max())]]))
         plot.set_xticks([])
         plot.set_yticks([])
     plt.tight_layout()
     plt.show()
 
+def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool or np.ndarray:
+    """places a piece into board on specified location or return False if it doesn't fit"""
+    # height, width = piece.shape
+    new_board = board.copy()
+    ys, xs = piece.nonzero()
+    number = piece[ys[0], xs[0]]
+    for y, x in zip(ys, xs):
+        if new_board[y+place[0], x+place[1]] != 0:
+            return False
+        new_board[y+place[0], x+place[1]] = number
+    return new_board
 
-def dopa
+
 
 # get input
 SOLVED_BOARD = read_file('plansza.txt')
 board_in_progress = read_file('plansza2.txt')
 
-# get basic info from input - all pieces, read how not placed pieces look like 
+# get basic info from input - all pieces, read how not placed pieces look like
 ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
 PLACED = set(list(chain(*board_in_progress.tolist())))
-# pieces - list of np.ndarrays representing 
+# pieces - list of np.ndarrays representing
 pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
-
+print(put_piece(board_in_progress, pieces[2], (1, 8)))
+print(board_in_progress)
