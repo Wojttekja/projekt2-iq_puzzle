@@ -33,6 +33,14 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
     """Shows in one windows main board and all the pieces"""
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
+    
+    if len(unused_pieces) == 0:
+        plt.imshow(main_board, cmap=ListedColormap(colors))
+        plt.title("Ulozona plansza")
+        plt.xticks([])
+        plt.yticks([])
+        plt.show()
+
     if len(unused_pieces) < 2:
         width = len(unused_pieces) + 1
     else:
@@ -41,12 +49,11 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
 
     fig = plt.figure(figsize=(15, 10))
     gs = fig.add_gridspec(height, width, width_ratios=[2]+[1]*(width-1), height_ratios=[1]*height)
-    colormap = ListedColormap(colors)
 
     main_plot = fig.add_subplot(gs[0, 0])
     unused_plots = [fig.add_subplot(gs[i, j+1]) for i in range(height) for j in range(width-1)]
 
-    main_plot.imshow(main_board, cmap=colormap)
+    main_plot.imshow(main_board, cmap=ListedColormap(colors))
     main_plot.set_title("Układana plansza")
     # get rid of axes descriptions
     main_plot.set_xticks([])
@@ -67,10 +74,16 @@ def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool o
     ys, xs = piece.nonzero()
     number = piece[ys[0], xs[0]]
     for y, x in zip(ys, xs):
-        if new_board[y+place[0], x+place[1]] != 0:
+        try:
+            if new_board[y+place[0], x+place[1]] != 0:
+                return False
+        except IndexError:
             return False
         new_board[y+place[0], x+place[1]] = number
     return new_board
+
+def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
+    
 
 
 
@@ -83,5 +96,11 @@ ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
 PLACED = set(list(chain(*board_in_progress.tolist())))
 # pieces - list of np.ndarrays representing
 pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
-print(put_piece(board_in_progress, pieces[2], (1, 8)))
-print(board_in_progress)
+# print(put_piece(board_in_progress, pieces[2], (1, 8)))
+# show(board_in_progress, pieces)
+board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=(0)), (0, 8))
+pieces.pop(0)
+# print(np.rot90(pieces[1], k=1))
+board_in_progress = put_piece(board_in_progress, np.rot90(pieces[1], k=1), (1, 9))
+pieces.pop(1)
+
