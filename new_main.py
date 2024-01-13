@@ -41,14 +41,17 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
     height = ceil(len(unused_pieces)/3)
     fig = plt.figure(figsize=(15, 10))
     gs = fig.add_gridspec(height, width, width_ratios=[2]+[1]*(width-1), height_ratios=[1]*height)
-    cmap = ListedColormap(colors)
+    colormap = ListedColormap(colors)
 
     main_plot = fig.add_subplot(gs[0, 0])
     unused_plots = [fig.add_subplot(gs[i, j]) for i in range(height) for j in range(1, width)]
     print(unused_plots)
-    main_plot.imshow(main_board, cmap=cmap)
+    main_plot.imshow(main_board, cmap=colormap)
     main_plot.set_title("Układana plansza")
-    
+    print(unused)
+    for board, plot in zip(unused_pieces, unused_plots):
+        print(colors[int(max(list(chain(*board.tolist()))))])
+        plot.imshow(board, cmap=ListedColormap([colors[0]]+[colors[int(max(list(chain(*board.tolist()))))]]))
     plt.tight_layout()
     plt.show()
 
@@ -57,4 +60,5 @@ SOLVED = read_file("plansza.txt")
 ALL_PIECES = read_all_pieces_from_board(SOLVED)
 used = read_all_pieces_from_board(board_in_progress)
 unused = [i for i in ALL_PIECES if i not in used]
-show(board_in_progress, unused)
+show(board_in_progress, [draw_an_element(i, SOLVED) for i in unused])
+# print()
