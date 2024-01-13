@@ -12,7 +12,7 @@ from itertools import chain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 # assumption there won't be more than 12 unplaced pieces
-UNUSED_PIC_SIZE = 200
+UNUSED_PIC_SIZE = 230
 POSITIONS_FOR_UNUSED_PIECES = [(x, y) for x in range(SCREEN_WIDTH//2+10, SCREEN_WIDTH, UNUSED_PIC_SIZE+10) for y in range(SCREEN_HEIGHT//4, SCREEN_HEIGHT-200, UNUSED_PIC_SIZE+10)]
 print(POSITIONS_FOR_UNUSED_PIECES)
 # quit()
@@ -117,7 +117,12 @@ while running:
     images = []
     for img_file in image_files:
         img = pygame.image.load(os.path.join('', img_file)).convert_alpha()
-        resized_img = pygame.transform.scale(img, (UNUSED_PIC_SIZE, UNUSED_PIC_SIZE))  # Resize 
+        img_height, img_width = img.get_height(), img.get_width()
+        # resize
+        if img_width > img_height:
+            resized_img = pygame.transform.scale(img, (UNUSED_PIC_SIZE, img_height * UNUSED_PIC_SIZE // img_width)) 
+        else:
+            resized_img = pygame.transform.scale(img, (img_width * UNUSED_PIC_SIZE // img_height, UNUSED_PIC_SIZE)) 
         images.append(resized_img)
     for img, pos in zip(images, POSITIONS_FOR_UNUSED_PIECES):
         screen.blit(img, pos)
