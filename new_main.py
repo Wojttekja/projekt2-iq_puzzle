@@ -82,8 +82,40 @@ def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool o
         new_board[y+place[0], x+place[1]] = number
     return new_board
 
+def get_all_variants(piece: np.ndarray) -> [np.ndarray]:
+    """returns list of variants of given piece, 
+    varaints meaning roteted or fliped piece"""
+    all_varaints = []
+    for k in range(-1, 3):
+        all_varaints.append(np.rot90(piece, k=k))
+
+    fliped = np.flip(piece, 0)
+    for k in range(-1, 3):
+        all_varaints.append(np.rot90(fliped, k=k))
+
+    return all_varaints
+    # # get rid of duplicates
+    # outcome = []
+    # helper = set()
+    # for i in all_varaints:
+    #     temp = tuple(i.flatten())
+    #     if temp not in helper:
+    #         outcome.append(i)
+    #         helper.add(temp)
+    # return outcome
+
 def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
-    ...
+    """Bruttally trying to place last piece into board"""
+    variants = get_all_variants(piece)
+    # import pdb; pdb.set_trace()
+    height, weight = board.shape
+    for y in range(height):
+        for x in range(weight):
+            for v in variants:
+                attempt = put_piece(board, v, (y, x))
+                if type(attempt) == np.ndarray:
+                    return attempt
+    return False
 
 
 
@@ -96,11 +128,11 @@ ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
 PLACED = set(list(chain(*board_in_progress.tolist())))
 # pieces - list of np.ndarrays representing
 pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
-# print(put_piece(board_in_progress, pieces[2], (1, 8)))
-# show(board_in_progress, pieces)
-board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=(0)), (0, 8))
+
+board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=0), (0, 8))
 pieces.pop(0)
-# print(np.rot90(pieces[1], k=1))
 board_in_progress = put_piece(board_in_progress, np.rot90(pieces[1], k=1), (1, 9))
 pieces.pop(1)
 
+print(board_in_progress)
+print(place_last_piece(board_in_progress, pieces[0]))
