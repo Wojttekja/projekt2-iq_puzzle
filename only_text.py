@@ -1,4 +1,4 @@
-"""Projekt WDI IQ puzzle - Wojciech Mierzejek <nrindeksu>"""
+"""Solves iq puzzle and prints only text version of solved board and a timer"""
 from math import ceil
 from itertools import chain
 import argparse
@@ -114,7 +114,6 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray},
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
     width = 3
 
-    print(datetime.now()-start)
 
     height = ceil(len(pieces_to_place)/2)
     fig = plt.figure(figsize=(15, 10))
@@ -175,7 +174,8 @@ def main():
     drawed_pieces = {i: draw_an_element(i, solved_board) for i in not_placed}
     pieces_to_place = list(drawed_pieces.values())
 
-    show_solving(solve(board_to_solve, pieces_to_place), drawed_pieces, not_placed, pause)
+    print(solve(board_to_solve, pieces_to_place))
+    print(datetime.now()-start)
 
 
 if __name__ == "__main__":
