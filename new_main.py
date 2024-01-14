@@ -1,13 +1,10 @@
 """Projekt WDI IQ puzzle - Wojciech Mierzejek 459435"""
 from math import ceil
 from itertools import chain
-from random import shuffle
+import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-
-from datetime import datetime
-start = datetime.now()
 
 def read_file(directory: str) -> np.ndarray:
     """Read file and return numpy array"""
@@ -33,44 +30,6 @@ def draw_an_element(element: int, board: np.ndarray) -> np.ndarray:
         drawed[row-row_shift, column-col_shift] = element
     return drawed
 
-def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
-    """Shows in one windows main board and all the pieces"""
-    colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
-               'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
-
-    if len(unused_pieces) == 0:
-        plt.imshow(main_board, cmap=ListedColormap(colors))
-        plt.title("Ulozona plansza")
-        plt.xticks([])
-        plt.yticks([])
-        plt.show()
-
-    if len(unused_pieces) < 2:
-        width = len(unused_pieces) + 1
-    else:
-        width = 3
-    height = ceil(len(unused_pieces)/2)
-
-    fig = plt.figure(figsize=(15, 10))
-    gs = fig.add_gridspec(height, width, width_ratios=[2]+[1]*(width-1), height_ratios=[1]*height)
-
-    main_plot = fig.add_subplot(gs[0, 0])
-    unused_plots = [fig.add_subplot(gs[i, j+1]) for i in range(height) for j in range(width-1)]
-
-    main_plot.imshow(main_board, cmap=ListedColormap(colors))
-    main_plot.set_title("Układana plansza")
-    # get rid of axes descriptions
-    main_plot.set_xticks([])
-    main_plot.set_yticks([])
-
-    for board, plot in zip(unused_pieces, unused_plots):
-        # add unused piece and make it specific color
-        plot.imshow(board, cmap=ListedColormap([colors[0]]+[colors[int(board.max())]]))
-        plot.set_xticks([])
-        plot.set_yticks([])
-    plt.tight_layout()
-    plt.show()
-
 def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool or np.ndarray:
     """places a piece into board on specified location or return False if it doesn't fit"""
     # height, width = piece.shape
@@ -87,8 +46,7 @@ def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool o
     return new_board
 
 def get_all_variants(piece: np.ndarray) -> [np.ndarray]:
-    """returns list of variants of given piece, 
-    varaints meaning roteted or fliped piece"""
+    """returns list of variants of given piece, varaints meaning roteted or fliped piece"""
     all_varaints = []
     listed_variants = []
     for k in range(-1, 3):
@@ -143,17 +101,15 @@ def solve(board_to_solve: np.ndarray, pieces: [np.ndarray]) -> np.ndarray:
             new += place_piece_in_every_place(b, pieces[0])
         posibilities = new.copy()
         pieces.pop(0)
-    
     for posiblity in posibilities:
         maybe_finished = place_last_piece(posiblity, pieces[0])
         if isinstance(maybe_finished, np.ndarray):
             return maybe_finished
     return False
 
-def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray}, pieces_to_place: list, pause: float) -> None:
-    """"sets pieces in random order and places them one by one"""
-    # shuffle(pieces_to_place)
-
+def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray},
+                 pieces_to_place: list, pause: float) -> None:
+    """sets pieces in random order and places them one by one"""
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
     width = 3
@@ -174,7 +130,8 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray}, pieces_to
     main_plot.set_yticks([])
     unused_show = []
     for piece, plot in zip(pieces_to_place, unused_plots):
-        unused_show.append(plot.imshow(drawed_pieces[piece], cmap=ListedColormap([colors[0]]+[colors[piece]])))
+        unused_show.append(plot.imshow(drawed_pieces[piece],
+                                       cmap=ListedColormap([colors[0]]+[colors[piece]])))
         plot.set_xticks([])
         plot.set_yticks([])
     plt.tight_layout()
@@ -192,18 +149,30 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray}, pieces_to
 
     plt.show()
 
+def main():
+    """Parsing arguments, solving and showing solving process"""
+    parser = argparse.ArgumentParser(description='IQ puzzle solver')
+    parser.add_argument('-n', '--pausetime', type=float,
+                        help='Input how long should program wait between moves', default=1.0)
+    parser.add_argument('-p', '--solved', type=str,
+                        help='Input directory to file with solved puzzle', default='plansza.txt')
+    parser.add_argument('input_file', type=str, help='Input file with puzzle to solve')
+    args = parser.parse_args()
+    pause = args.pausetime
+    solved_file = args.solved
+    file_to_solve = args.input_file
+
+    solved_board = read_file(solved_file)
+    board_to_solve = read_file(file_to_solve)
+
+    all_pieces = read_all_pieces_from_board(solved_board)
+    placed = set(list(chain(*board_to_solve.tolist())))
+    not_placed = [i for i in all_pieces if i not in placed]
+    drawed_pieces = {i: draw_an_element(i, solved_board) for i in not_placed}
+    pieces_to_place = list(drawed_pieces.values())
+
+    show_solving(solve(board_to_solve, pieces_to_place), drawed_pieces, not_placed, pause)
 
 
-# get input
-SOLVED_BOARD = read_file('plansza.txt')
-BOARD_TO_SOLVE = read_file('plansza3.txt')
-
-# get basic info from input - all pieces, read how not placed pieces look like
-ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
-PLACED = set(list(chain(*BOARD_TO_SOLVE.tolist())))
-NOT_PLACED = [i for i in ALL_PIECES if i not in PLACED]
-shuffle(NOT_PLACED)
-DRAWED_PIECES = {i: draw_an_element(i, SOLVED_BOARD) for i in NOT_PLACED}
-
-print(solve(BOARD_TO_SOLVE, list(DRAWED_PIECES.values())))
-show_solving(solve(BOARD_TO_SOLVE, list(DRAWED_PIECES.values())), DRAWED_PIECES, NOT_PLACED, 1.0)
+if __name__ == "__main__":
+    main()
