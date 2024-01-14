@@ -5,6 +5,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
+from datetime import datetime
+start = datetime.now()
+
 def read_file(directory: str) -> np.ndarray:
     """Read file and return numpy array"""
     with open(directory, 'r', encoding='UTF-8') as file:
@@ -130,31 +133,35 @@ def place_piece_in_every_place(board: np.ndarray, piece: np.ndarray) -> [np.ndar
                     outcome.append(attempt)
     return outcome
 
+def solve(board_to_solve: np.ndarray, pieces: [np.ndarray]) -> np.ndarray:
+    """"returns solved board using given pieces or False if board is unsolvable"""
+    posibilities = [board_to_solve]
+    while len(pieces) > 1:
+        new = []
+        for b in posibilities:
+            new += place_piece_in_every_place(b, pieces[0])
+        posibilities = new.copy()
+        pieces.pop(0)
+    
+    for posiblity in posibilities:
+        maybe_finished = place_last_piece(posiblity, pieces[0])
+        if isinstance(maybe_finished, np.ndarray):
+            return maybe_finished
+    return False
+
+def show_solving(solved: np.ndarray, drawed_pieces: [np.ndarray], pieces_to_place: list) -> None:
+    """"sets pieces in random order and puts them one by one"""
+    ...
 
 # get input
 SOLVED_BOARD = read_file('plansza.txt')
-BOARD_TO_SOLVE = read_file('plansza3.txt')
+BOARD_TO_SOLVE = read_file('plansza2.txt')
 
 # get basic info from input - all pieces, read how not placed pieces look like
 ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
 PLACED = set(list(chain(*BOARD_TO_SOLVE.tolist())))
 NOT_PLACED = [i for i in ALL_PIECES if i not in PLACED]
-# pieces - list of np.ndarrays representing
+DRAWED_PIECES = [draw_an_element(i, SOLVED_BOARD) for i in NOT_PLACED]
 
-pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
-posibilities = [BOARD_TO_SOLVE]
-
-while len(pieces) > 1:
-    new = []
-    for b in posibilities:
-        new += place_piece_in_every_place(b, pieces[0])
-    posibilities = new.copy()
-    pieces.pop(0)
-
-print(len(posibilities))
-for posiblity in posibilities:
-    temp = place_last_piece(posiblity, pieces[0])
-    if isinstance(temp, np.ndarray):
-        print(temp)
-        # show solving
-        break
+print(solve(BOARD_TO_SOLVE, DRAWED_PIECES))
+print(datetime.now()-start)
