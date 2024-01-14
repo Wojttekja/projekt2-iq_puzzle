@@ -33,7 +33,7 @@ def show(main_board: np.ndarray, unused_pieces: [np.ndarray]) -> None:
     """Shows in one windows main board and all the pieces"""
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
-    
+
     if len(unused_pieces) == 0:
         plt.imshow(main_board, cmap=ListedColormap(colors))
         plt.title("Ulozona plansza")
@@ -113,7 +113,7 @@ def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
         for x in range(weight):
             for v in variants:
                 attempt = put_piece(board, v, (y, x))
-                if type(attempt) == np.ndarray:
+                if isinstance(attempt, np.ndarray):
                     return attempt
     return False
 
