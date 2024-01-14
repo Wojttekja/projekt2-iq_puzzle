@@ -24,7 +24,6 @@ def draw_an_element(element: int, board: np.ndarray) -> np.ndarray:
     row_indexes, column_indexes = np.where(board == element)
     drawed = np.zeros((max(row_indexes)-min(row_indexes)+1,
                        max(column_indexes)-min(column_indexes)+1))
-    # print(drawed)
     row_shift, col_shift = min(row_indexes), min(column_indexes)
     for row, column in zip(row_indexes, column_indexes):
         drawed[row-row_shift, column-col_shift] = element
@@ -32,7 +31,6 @@ def draw_an_element(element: int, board: np.ndarray) -> np.ndarray:
 
 def put_piece(board: np.ndarray, piece: np.ndarray, place: (int, int)) -> bool or np.ndarray:
     """places a piece into board on specified location or return False if it doesn't fit"""
-    # height, width = piece.shape
     new_board = board.copy()
     ys, xs = piece.nonzero()
     number = piece[ys[0], xs[0]]
@@ -69,7 +67,6 @@ def get_all_variants(piece: np.ndarray) -> [np.ndarray]:
 def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
     """Bruttally trying to place last piece into board"""
     variants = get_all_variants(piece)
-    # import pdb; pdb.set_trace()
     height, width = board.shape
     for y in range(height):
         for x in range(width):
