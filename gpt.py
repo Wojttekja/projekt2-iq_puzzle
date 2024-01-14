@@ -1,13 +1,8 @@
-import numpy as np
+import random
 
-# Create a multidimensional array
-array = np.array([[1, 2, 3],
-                  [4, 5, 6],
-                  [7, 8, 9]])
+my_list = [1, 2, 3, 4]
 
-# Get all indices using numpy.indices
-indices = np.indices(array.shape).T.reshape(-1, array.ndim)
+# Shuffle the list in place
+random.shuffle(my_list)
 
-# Display the result
-print(indices)
-print(array[indices[0]])
+print(my_list)

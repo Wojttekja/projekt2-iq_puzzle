@@ -1,6 +1,7 @@
 """Projekt WDI IQ puzzle - Wojciech Mierzejek 459435"""
 from math import ceil
 from itertools import chain
+from random import shuffle
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -149,19 +150,60 @@ def solve(board_to_solve: np.ndarray, pieces: [np.ndarray]) -> np.ndarray:
             return maybe_finished
     return False
 
-def show_solving(solved: np.ndarray, drawed_pieces: [np.ndarray], pieces_to_place: list) -> None:
-    """"sets pieces in random order and puts them one by one"""
-    ...
+def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray}, pieces_to_place: list, pause: float) -> None:
+    """"sets pieces in random order and places them one by one"""
+    # shuffle(pieces_to_place)
+
+    colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
+               'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
+    width = 3
+    height = ceil(len(pieces_to_place)/2)
+    fig = plt.figure(figsize=(15, 10))
+    gs = fig.add_gridspec(height, width, width_ratios=[2, 1, 1], height_ratios=[1]*height)
+
+    main_plot = fig.add_subplot(gs[0, 0])
+    unused_plots = [fig.add_subplot(gs[i, j]) for i in range(height) for j in range(1, width)]
+
+    # initialize plots and show starting board and pieces
+    in_progress = solved.copy()
+    for number in pieces_to_place:
+        in_progress[in_progress == number] = 0
+    main_show = main_plot.imshow(in_progress, cmap=ListedColormap(colors))
+    main_plot.set_title("Układana plansza")
+    main_plot.set_xticks([])
+    main_plot.set_yticks([])
+    unused_show = []
+    for piece, plot in zip(pieces_to_place, unused_plots):
+        unused_show.append(plot.imshow(drawed_pieces[piece], cmap=ListedColormap([colors[0]]+[colors[piece]])))
+        plot.set_xticks([])
+        plot.set_yticks([])
+    plt.tight_layout()
+
+    # start placing puzzles one by one
+    for i in range(len(pieces_to_place)):
+        plt.pause(pause)
+        unused_show[i].set_data(np.zeros(drawed_pieces[pieces_to_place[0]].shape))
+        pieces_to_place.pop(0)
+        in_progress = solved.copy()
+        for number in pieces_to_place:
+            in_progress[in_progress == number] = 0
+
+        main_show.set_data(in_progress)
+
+    plt.show()
+
+
 
 # get input
 SOLVED_BOARD = read_file('plansza.txt')
-BOARD_TO_SOLVE = read_file('plansza2.txt')
+BOARD_TO_SOLVE = read_file('plansza3.txt')
 
 # get basic info from input - all pieces, read how not placed pieces look like
 ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
 PLACED = set(list(chain(*BOARD_TO_SOLVE.tolist())))
 NOT_PLACED = [i for i in ALL_PIECES if i not in PLACED]
-DRAWED_PIECES = [draw_an_element(i, SOLVED_BOARD) for i in NOT_PLACED]
+shuffle(NOT_PLACED)
+DRAWED_PIECES = {i: draw_an_element(i, SOLVED_BOARD) for i in NOT_PLACED}
 
-print(solve(BOARD_TO_SOLVE, DRAWED_PIECES))
-print(datetime.now()-start)
+print(solve(BOARD_TO_SOLVE, list(DRAWED_PIECES.values())))
+show_solving(solve(BOARD_TO_SOLVE, list(DRAWED_PIECES.values())), DRAWED_PIECES, NOT_PLACED, 1.0)
