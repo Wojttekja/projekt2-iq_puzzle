@@ -96,14 +96,13 @@ def get_all_variants(piece: np.ndarray) -> [np.ndarray]:
 
     fliped = np.flip(piece, 0)
     for k in range(-1, 3):
-        temp = np.rot90(piece, k=k)
+        temp = np.rot90(fliped, k=k)
         listed_temp = temp.tolist()
         if listed_temp not in listed_variants:
             listed_variants.append(listed_temp)
             all_varaints.append(temp)
 
     return all_varaints
-
 
 def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
     """Bruttally trying to place last piece into board"""
@@ -132,30 +131,30 @@ def place_piece_in_every_place(board: np.ndarray, piece: np.ndarray) -> [np.ndar
     return outcome
 
 
-
-
 # get input
 SOLVED_BOARD = read_file('plansza.txt')
-board_in_progress = read_file('plansza2.txt')
+BOARD_TO_SOLVE = read_file('plansza3.txt')
 
 # get basic info from input - all pieces, read how not placed pieces look like
 ALL_PIECES = read_all_pieces_from_board(SOLVED_BOARD)
-PLACED = set(list(chain(*board_in_progress.tolist())))
+PLACED = set(list(chain(*BOARD_TO_SOLVE.tolist())))
+NOT_PLACED = [i for i in ALL_PIECES if i not in PLACED]
 # pieces - list of np.ndarrays representing
+
 pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACED]
+posibilities = [BOARD_TO_SOLVE]
 
-board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=0), (0, 8))
-pieces.pop(0)
+while len(pieces) > 1:
+    new = []
+    for b in posibilities:
+        new += place_piece_in_every_place(b, pieces[0])
+    posibilities = new.copy()
+    pieces.pop(0)
 
-b = get_all_variants(pieces[0])
-for i in b:
-    print(i)
-    print()
-quit()
-
-print(pieces[0])
-print()
-a = place_piece_in_every_place(board_in_progress, pieces[0])
-for i in a:
-    print(i)
-    print()
+print(len(posibilities))
+for posiblity in posibilities:
+    temp = place_last_piece(posiblity, pieces[0])
+    if isinstance(temp, np.ndarray):
+        print(temp)
+        # show solving
+        break
