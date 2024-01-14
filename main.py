@@ -1,4 +1,4 @@
-"""Projekt WDI IQ puzzle - Wojciech Mierzejek 459435"""
+"""Projekt WDI IQ puzzle - Wojciech Mierzejek <nrindeksu>"""
 from math import ceil
 from itertools import chain
 import argparse
