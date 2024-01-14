@@ -129,6 +129,7 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray},
     for piece, plot in zip(pieces_to_place, unused_plots):
         unused_show.append(plot.imshow(drawed_pieces[piece],
                                        cmap=ListedColormap([colors[0]]+[colors[piece]])))
+    for plot in unused_plots:
         plot.set_xticks([])
         plot.set_yticks([])
     plt.tight_layout()
