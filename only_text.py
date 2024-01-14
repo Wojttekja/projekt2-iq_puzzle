@@ -1,4 +1,5 @@
 """Solves iq puzzle and prints only text version of solved board and a timer"""
+from datetime import datetime
 from math import ceil
 from itertools import chain
 import argparse
@@ -6,7 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
-from datetime import datetime
 start = datetime.now()
 
 def read_file(directory: str) -> np.ndarray:
@@ -155,13 +155,10 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray},
 def main():
     """Parsing arguments, solving and showing solving process"""
     parser = argparse.ArgumentParser(description='IQ puzzle solver')
-    parser.add_argument('-n', '--pausetime', type=float,
-                        help='Input how long should program wait between moves', default=1.0)
     parser.add_argument('-p', '--solved', type=str,
                         help='Input directory to file with solved puzzle', default='plansza.txt')
     parser.add_argument('input_file', type=str, help='Input file with puzzle to solve')
     args = parser.parse_args()
-    pause = args.pausetime
     solved_file = args.solved
     file_to_solve = args.input_file
 

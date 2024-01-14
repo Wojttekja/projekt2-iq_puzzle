@@ -6,8 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 
-from datetime import datetime
-start = datetime.now()
 
 def read_file(directory: str) -> np.ndarray:
     """Read file and return numpy array"""
@@ -113,9 +111,6 @@ def show_solving(solved: np.ndarray, drawed_pieces: {int: np.ndarray},
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
     width = 3
-
-    print(datetime.now()-start)
-
     height = ceil(len(pieces_to_place)/2)
     fig = plt.figure(figsize=(15, 10))
     gs = fig.add_gridspec(height, width, width_ratios=[2, 1, 1], height_ratios=[1]*height)
