@@ -86,23 +86,24 @@ def get_all_variants(piece: np.ndarray) -> [np.ndarray]:
     """returns list of variants of given piece, 
     varaints meaning roteted or fliped piece"""
     all_varaints = []
+    listed_variants = []
     for k in range(-1, 3):
-        all_varaints.append(np.rot90(piece, k=k))
+        temp = np.rot90(piece, k=k)
+        listed_temp = temp.tolist()
+        if listed_temp not in listed_variants:
+            listed_variants.append(listed_temp)
+            all_varaints.append(temp)
 
     fliped = np.flip(piece, 0)
     for k in range(-1, 3):
-        all_varaints.append(np.rot90(fliped, k=k))
+        temp = np.rot90(piece, k=k)
+        listed_temp = temp.tolist()
+        if listed_temp not in listed_variants:
+            listed_variants.append(listed_temp)
+            all_varaints.append(temp)
 
     return all_varaints
-    # # get rid of duplicates
-    # outcome = []
-    # helper = set()
-    # for i in all_varaints:
-    #     temp = tuple(i.flatten())
-    #     if temp not in helper:
-    #         outcome.append(i)
-    #         helper.add(temp)
-    # return outcome
+
 
 def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
     """Bruttally trying to place last piece into board"""
@@ -145,6 +146,12 @@ pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACE
 
 board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=0), (0, 8))
 pieces.pop(0)
+
+b = get_all_variants(pieces[0])
+for i in b:
+    print(i)
+    print()
+quit()
 
 print(pieces[0])
 print()
