@@ -108,14 +108,28 @@ def place_last_piece(board: np.ndarray, piece: np.ndarray) -> np.ndarray:
     """Bruttally trying to place last piece into board"""
     variants = get_all_variants(piece)
     # import pdb; pdb.set_trace()
-    height, weight = board.shape
+    height, width = board.shape
     for y in range(height):
-        for x in range(weight):
+        for x in range(width):
             for v in variants:
                 attempt = put_piece(board, v, (y, x))
                 if isinstance(attempt, np.ndarray):
                     return attempt
     return False
+
+def place_piece_in_every_place(board: np.ndarray, piece: np.ndarray) -> [np.ndarray]:
+    """returns list of boards with placed some piece"""
+    outcome = []
+    variants = get_all_variants(piece)
+    height, width = board.shape
+    for y in range(height):
+        for x in range(width):
+            for v in variants:
+                attempt = put_piece(board, v, (y, x))
+                if isinstance(attempt, np.ndarray):
+                    outcome.append(attempt)
+    return outcome
+
 
 
 
@@ -131,8 +145,10 @@ pieces = [draw_an_element(i, SOLVED_BOARD) for i in ALL_PIECES if i not in PLACE
 
 board_in_progress = put_piece(board_in_progress, np.flip(np.rot90(pieces[0]), axis=0), (0, 8))
 pieces.pop(0)
-board_in_progress = put_piece(board_in_progress, np.rot90(pieces[1], k=1), (1, 9))
-pieces.pop(1)
 
-print(board_in_progress)
-print(place_last_piece(board_in_progress, pieces[0]))
+print(pieces[0])
+print()
+a = place_piece_in_every_place(board_in_progress, pieces[0])
+for i in a:
+    print(i)
+    print()
