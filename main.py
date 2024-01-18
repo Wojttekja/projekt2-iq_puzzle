@@ -4,8 +4,8 @@ from itertools import chain
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.image import AxesImage
 from matplotlib.colors import ListedColormap
-
 
 def read_file(directory: str) -> np.ndarray:
     """Read file and return numpy array"""
@@ -65,88 +65,56 @@ def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
 
     return all_varaints
 
-def place_last_puzzle(board: np.ndarray, puzzle: np.ndarray) -> np.ndarray:
-    """Bruttally trying to place last puzzle into board"""
-    variants = get_all_variants(puzzle)
-    height, width = board.shape
+def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray], current_puzzle: int,
+          pause: float, main_show: AxesImage, unused_show: [AxesImage]) -> np.ndarray:
+    """solves puzzle recursively"""
+    main_show.set_data(board_to_solve)
+    for puzzle, plot, i in zip(puzzles, unused_show, range(len(puzzles))):
+        if i < current_puzzle:
+            plot.set_data(np.zeros(puzzle.shape))
+        else:
+            plot.set_data(puzzle)
+    plt.pause(pause)
+
+    if len(puzzles) == current_puzzle:
+        return board_to_solve
+    variants = get_all_variants(puzzles[current_puzzle])
+    height, width = board_to_solve.shape
     for y in range(height):
         for x in range(width):
             for v in variants:
-                attempt = put_puzzle(board, v, (y, x))
-                if isinstance(attempt, np.ndarray):
-                    return attempt
+                temp = put_puzzle(board_to_solve, v, (y, x))
+                if isinstance(temp, np.ndarray):
+                    temp2 = solve(temp, puzzles, current_puzzle+1, pause, main_show, unused_show)
+                    if isinstance(temp2, np.ndarray):
+                        return temp2
     return False
 
-def place_puzzle_in_every_place(board: np.ndarray, puzzle: np.ndarray) -> [np.ndarray]:
-    """returns list of boards with placed some puzzle"""
-    outcome = []
-    variants = get_all_variants(puzzle)
-    height, width = board.shape
-    for y in range(height):
-        for x in range(width):
-            for v in variants:
-                attempt = put_puzzle(board, v, (y, x))
-                if isinstance(attempt, np.ndarray):
-                    outcome.append(attempt)
-    return outcome
-
-def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
-    """"returns solved board using given puzzles or False if board is unsolvable"""
-    posibilities = [board_to_solve]
-    while len(puzzles) > 1:
-        new = []
-        for b in posibilities:
-            new += place_puzzle_in_every_place(b, puzzles[0])
-        posibilities = new.copy()
-        puzzles.pop(0)
-    for posiblity in posibilities:
-        maybe_finished = place_last_puzzle(posiblity, puzzles[0])
-        if isinstance(maybe_finished, np.ndarray):
-            return maybe_finished
-    return False
-
-def show_solving(solved: np.ndarray, drawed_puzzles: {int: np.ndarray},
-                 puzzles_to_place: list, pause: float) -> None:
-    """sets puzzles in random order and places them one by one"""
+def start_showing(main_board: np.ndarray, puzzles: {int: np.ndarray}) -> (AxesImage, [AxesImage]):
+    """Initializes a window and shows first board and puzzles to place"""
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
+    puzzles_to_place = list(puzzles.values())
     width = 3
     height = ceil(len(puzzles_to_place)/2)
     fig = plt.figure(figsize=(15, 10))
     gs = fig.add_gridspec(height, width, width_ratios=[2, 1, 1], height_ratios=[1]*height)
-
     main_plot = fig.add_subplot(gs[0, 0])
     unused_plots = [fig.add_subplot(gs[i, j]) for i in range(height) for j in range(1, width)]
-
-    # initialize plots and show starting board and puzzles
-    in_progress = solved.copy()
-    for number in puzzles_to_place:
-        in_progress[in_progress == number] = 0
-    main_show = main_plot.imshow(in_progress, cmap=ListedColormap(colors))
+    main_show = main_plot.imshow(main_board, cmap=ListedColormap(colors))
     main_plot.set_title("Układana plansza")
     main_plot.set_xticks([])
     main_plot.set_yticks([])
     unused_show = []
-    for puzzle, plot in zip(puzzles_to_place, unused_plots):
-        unused_show.append(plot.imshow(drawed_puzzles[puzzle],
+    for puzzle, plot in zip(puzzles.keys(), unused_plots):
+        unused_show.append(plot.imshow(puzzles[puzzle],
                                        cmap=ListedColormap([colors[0]]+[colors[puzzle]])))
     for plot in unused_plots:
         plot.set_xticks([])
         plot.set_yticks([])
     plt.tight_layout()
 
-    # start placing puzzles one by one
-    for i in range(len(puzzles_to_place)):
-        plt.pause(pause)
-        unused_show[i].set_data(np.zeros(drawed_puzzles[puzzles_to_place[0]].shape))
-        puzzles_to_place.pop(0)
-        in_progress = solved.copy()
-        for number in puzzles_to_place:
-            in_progress[in_progress == number] = 0
-
-        main_show.set_data(in_progress)
-
-    plt.show()
+    return main_show, unused_show
 
 def main():
     """Parsing arguments, solving and showing solving process"""
@@ -170,7 +138,12 @@ def main():
     drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
 
-    show_solving(solve(board_to_solve, puzzles_to_place), drawed_puzzles, not_placed, pause)
+    # show first board
+    main_show, unused_show = start_showing(board_to_solve, drawed_puzzles)
+    solve(board_to_solve, puzzles_to_place, 0, pause, main_show, unused_show)
+    print(type(main_show), type(unused_show))
+
+    plt.show()
 
 
 if __name__ == "__main__":
