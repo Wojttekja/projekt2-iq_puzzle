@@ -108,11 +108,21 @@ def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
     return False
 
 
-def new_solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
+def new_solve(board_to_solve: np.ndarray, puzzles: [np.ndarray], current_puzzle: int, pause: float) -> np.ndarray:
     """solves puzzle recursively"""
-    if len(puzzles) == 0:
+    global main_show, unused_show
+    main_show.set_data(board_to_solve)
+    for puzzle, plot, i in zip(puzzles, unused_show, range(len(puzzles))):
+        if i < current_puzzle:
+            plot.set_data(np.zeros(puzzle.shape))
+        else:
+            plot.set_data(puzzle)
+    
+    plt.pause(pause)
+
+    if len(puzzles) == current_puzzle:
         return board_to_solve
-    variants = get_all_variants(puzzles[0])
+    variants = get_all_variants(puzzles[current_puzzle])
     height, width = board_to_solve.shape
     for y in range(height):
         for x in range(width):
@@ -120,7 +130,7 @@ def new_solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
                 temp = put_puzzle(board_to_solve, v, (y, x))
                 if isinstance(temp, np.ndarray):
                     
-                    temp2 = new_solve(temp, puzzles[1:])
+                    temp2 = new_solve(temp, puzzles, current_puzzle+1, pause)
                     if isinstance(temp2, np.ndarray):
                         return temp2
     return False
@@ -188,9 +198,11 @@ def main():
     placed = set(list(chain(*board_to_solve.tolist())))
     not_placed = [i for i in all_puzzles if i not in placed]
     drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
+    # drawed_puzzles = dict(sorted(drawed_puzzles.items(), key=lambda x: np.count_nonzero(x[1]==0)))
     puzzles_to_place = list(drawed_puzzles.values())
 
     # show first board
+    global main_show, unused_show
     colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
                'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
     width = 3
@@ -199,11 +211,25 @@ def main():
     gs = fig.add_gridspec(height, width, width_ratios=[2, 1, 1], height_ratios=[1]*height)
     main_plot = fig.add_subplot(gs[0, 0])
     unused_plots = [fig.add_subplot(gs[i, j]) for i in range(height) for j in range(1, width)]
+    main_show = main_plot.imshow(board_to_solve, cmap=ListedColormap(colors))
+    main_plot.set_title("Układana plansza")
+    main_plot.set_xticks([])
+    main_plot.set_yticks([])
+    unused_show = []
+    for puzzle, plot in zip(drawed_puzzles.keys(), unused_plots):
+        unused_show.append(plot.imshow(drawed_puzzles[puzzle],
+                                       cmap=ListedColormap([colors[0]]+[colors[puzzle]])))
+    for plot in unused_plots:
+        plot.set_xticks([])
+        plot.set_yticks([])
+    plt.tight_layout()
 
 
     # show_solving(solve(board_to_solve, puzzles_to_place), drawed_puzzles, not_placed, pause)
-    print(new_solve(board_to_solve, puzzles_to_place))
+    print(new_solve(board_to_solve, puzzles_to_place, 0, pause))
     print(datetime.now() - start)
+
+    plt.show()
 
 
 if __name__ == "__main__":
