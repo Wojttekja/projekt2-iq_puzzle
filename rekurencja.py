@@ -109,6 +109,7 @@ def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
 
 
 def new_solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
+    """solves puzzle recursively"""
     if len(puzzles) == 0:
         return board_to_solve
     variants = get_all_variants(puzzles[0])
@@ -118,7 +119,7 @@ def new_solve(board_to_solve: np.ndarray, puzzles: [np.ndarray]) -> np.ndarray:
             for v in variants:
                 temp = put_puzzle(board_to_solve, v, (y, x))
                 if isinstance(temp, np.ndarray):
-                    # import pdb; pdb.set_trace()
+                    
                     temp2 = new_solve(temp, puzzles[1:])
                     if isinstance(temp2, np.ndarray):
                         return temp2
@@ -188,6 +189,17 @@ def main():
     not_placed = [i for i in all_puzzles if i not in placed]
     drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
+
+    # show first board
+    colors = ['white', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink',
+               'brown', 'red', 'cyan', 'magenta', 'gray', 'lightgreen']
+    width = 3
+    height = ceil(len(puzzles_to_place)/2)
+    fig = plt.figure(figsize=(15, 10))
+    gs = fig.add_gridspec(height, width, width_ratios=[2, 1, 1], height_ratios=[1]*height)
+    main_plot = fig.add_subplot(gs[0, 0])
+    unused_plots = [fig.add_subplot(gs[i, j]) for i in range(height) for j in range(1, width)]
+
 
     # show_solving(solve(board_to_solve, puzzles_to_place), drawed_puzzles, not_placed, pause)
     print(new_solve(board_to_solve, puzzles_to_place))
