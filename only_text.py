@@ -9,15 +9,14 @@ from main import draw_element, put_puzzle, get_all_variants
 start = datetime.now()
 
 def solve_without_showing(board_to_solve: np.ndarray,
-                          puzzles: [np.ndarray], current_puzzle: int) -> np.ndarray:
+                          puzzles: [[np.ndarray]], current_puzzle: int) -> np.ndarray:
     """solves puzzle recursively"""
     if len(puzzles) == current_puzzle:
         return board_to_solve
-    variants = get_all_variants(puzzles[current_puzzle])
     height, width = board_to_solve.shape
     for y in range(height):
         for x in range(width):
-            for v in variants:
+            for v in puzzles[current_puzzle]:
                 temp = put_puzzle(board_to_solve, v, (y, x))
                 if isinstance(temp, np.ndarray):
                     temp2 = solve_without_showing(temp, puzzles, current_puzzle+1)
@@ -44,7 +43,7 @@ def main():
     drawed_puzzles = {i: draw_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
 
-    print(solve_without_showing(board_to_solve, puzzles_to_place, 0))
+    print(solve_without_showing(board_to_solve, [get_all_variants(i) for i in puzzles_to_place], 0))
     print(datetime.now()-start)
 
 

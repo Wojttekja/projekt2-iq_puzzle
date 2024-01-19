@@ -46,9 +46,9 @@ def put_puzzle(board: np.ndarray, puzzle: np.ndarray, place: (int, int)) -> bool
 
 def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
     """returns list of variants of given puzzle, varaints meaning roteted or fliped puzzle"""
-    all_varaints = []
-    listed_variants = []
-    for k in range(-1, 3):
+    all_varaints = [puzzle]
+    listed_variants = [puzzle.tolist()]
+    for k in (-1, 1, 2):
         temp = np.rot90(puzzle, k=k)
         listed_temp = temp.tolist()
         if listed_temp not in listed_variants:
@@ -56,7 +56,7 @@ def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
             all_varaints.append(temp)
 
     fliped = np.flip(puzzle, 0)
-    for k in range(-1, 3):
+    for k in (-1, 0, 1, 2):
         temp = np.rot90(fliped, k=k)
         listed_temp = temp.tolist()
         if listed_temp not in listed_variants:
@@ -65,24 +65,23 @@ def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
 
     return all_varaints
 
-def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray], current_puzzle: int,
+def solve(board_to_solve: np.ndarray, puzzles: [[np.ndarray]], current_puzzle: int,
           pause: float, main_show: AxesImage, unused_show: [AxesImage]) -> np.ndarray:
     """solves puzzle recursively"""
     main_show.set_data(board_to_solve)
     for puzzle, plot, i in zip(puzzles, unused_show, range(len(puzzles))):
         if i < current_puzzle:
-            plot.set_data(np.zeros(puzzle.shape))
+            plot.set_data(np.zeros(puzzle[0].shape))
         else:
-            plot.set_data(puzzle)
+            plot.set_data(puzzle[0])
     plt.pause(pause)
 
     if len(puzzles) == current_puzzle:
         return board_to_solve
-    variants = get_all_variants(puzzles[current_puzzle])
     height, width = board_to_solve.shape
     for y in range(height):
         for x in range(width):
-            for v in variants:
+            for v in puzzles[current_puzzle]:
                 temp = put_puzzle(board_to_solve, v, (y, x))
                 if isinstance(temp, np.ndarray):
                     temp2 = solve(temp, puzzles, current_puzzle+1, pause, main_show, unused_show)
@@ -136,11 +135,12 @@ def main():
     placed = set(list(chain(*board_to_solve.tolist())))
     not_placed = [i for i in all_puzzles if i not in placed]
     drawed_puzzles = {i: draw_element(i, solved_board) for i in not_placed}
-    puzzles_to_place = list(drawed_puzzles.values())
 
+    # print(get_all_variants(drawed_puzzles[7]))
+    
     # show first board
     main_show, unused_show = start_showing(board_to_solve, drawed_puzzles)
-    solve(board_to_solve, puzzles_to_place, 0, pause, main_show, unused_show)
+    solve(board_to_solve, [get_all_variants(i) for i in drawed_puzzles.values()], 0, pause, main_show, unused_show)
 
     plt.show()
 
