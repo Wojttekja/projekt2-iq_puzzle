@@ -3,69 +3,13 @@ from datetime import datetime
 from itertools import chain
 import argparse
 import numpy as np
+from main import read_file, read_all_puzzles_from_board
+from main import draw_an_element, put_puzzle, get_all_variants
 
 start = datetime.now()
 
-def read_file(directory: str) -> np.ndarray:
-    """Read file and return numpy array"""
-    with open(directory, 'r', encoding='UTF-8') as file:
-        data = file.read().splitlines()
-    board = [[int(j) for j in i.split()] for i in data[1:]]
-    board = np.array(board)
-    return board
-
-def read_all_puzzles_from_board(board: np.ndarray) -> list:
-    """Returns a setted list of numbers of puzzles included in a board"""
-    temp = board.tolist()
-    return set(list(chain(*temp)))
-
-def draw_an_element(element: int, board: np.ndarray) -> np.ndarray:
-    """Draws a small numpy array including only specific element"""
-    row_indexes, column_indexes = np.where(board == element)
-    drawed = np.zeros((max(row_indexes)-min(row_indexes)+1,
-                       max(column_indexes)-min(column_indexes)+1))
-    row_shift, col_shift = min(row_indexes), min(column_indexes)
-    for row, column in zip(row_indexes, column_indexes):
-        drawed[row-row_shift, column-col_shift] = element
-    return drawed
-
-def put_puzzle(board: np.ndarray, puzzle: np.ndarray, place: (int, int)) -> bool or np.ndarray:
-    """places a puzzle into board on specified location or return False if it doesn't fit"""
-    new_board = board.copy()
-    ys, xs = puzzle.nonzero()
-    number = puzzle[ys[0], xs[0]]
-    for y, x in zip(ys, xs):
-        try:
-            if new_board[y+place[0], x+place[1]] != 0:
-                return False
-        except IndexError:
-            return False
-        new_board[y+place[0], x+place[1]] = number
-    return new_board
-
-def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
-    """returns list of variants of given puzzle, varaints meaning roteted or fliped puzzle"""
-    all_varaints = []
-    listed_variants = []
-    for k in range(-1, 3):
-        temp = np.rot90(puzzle, k=k)
-        listed_temp = temp.tolist()
-        if listed_temp not in listed_variants:
-            listed_variants.append(listed_temp)
-            all_varaints.append(temp)
-
-    fliped = np.flip(puzzle, 0)
-    for k in range(-1, 3):
-        temp = np.rot90(fliped, k=k)
-        listed_temp = temp.tolist()
-        if listed_temp not in listed_variants:
-            listed_variants.append(listed_temp)
-            all_varaints.append(temp)
-
-    return all_varaints
-
-
-def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray], current_puzzle: int) -> np.ndarray:
+def solve_without_showing(board_to_solve: np.ndarray,
+                          puzzles: [np.ndarray], current_puzzle: int) -> np.ndarray:
     """solves puzzle recursively"""
     if len(puzzles) == current_puzzle:
         return board_to_solve
@@ -76,11 +20,10 @@ def solve(board_to_solve: np.ndarray, puzzles: [np.ndarray], current_puzzle: int
             for v in variants:
                 temp = put_puzzle(board_to_solve, v, (y, x))
                 if isinstance(temp, np.ndarray):
-                    temp2 = solve(temp, puzzles, current_puzzle+1)
+                    temp2 = solve_without_showing(temp, puzzles, current_puzzle+1)
                     if isinstance(temp2, np.ndarray):
                         return temp2
     return False
-
 
 def main():
     """Parsing arguments, solving and showing solving process"""
@@ -101,7 +44,7 @@ def main():
     drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
 
-    print(solve(board_to_solve, puzzles_to_place, 0))
+    print(solve_without_showing(board_to_solve, puzzles_to_place, 0))
     print(datetime.now()-start)
 
 
