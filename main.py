@@ -20,7 +20,7 @@ def read_all_puzzles_from_board(board: np.ndarray) -> list:
     temp = board.tolist()
     return set(list(chain(*temp)))
 
-def draw_an_element(element: int, board: np.ndarray) -> np.ndarray:
+def draw_element(element: int, board: np.ndarray) -> np.ndarray:
     """Draws a small numpy array including only specific element"""
     row_indexes, column_indexes = np.where(board == element)
     drawed = np.zeros((max(row_indexes)-min(row_indexes)+1,
@@ -135,13 +135,12 @@ def main():
     all_puzzles = read_all_puzzles_from_board(solved_board)
     placed = set(list(chain(*board_to_solve.tolist())))
     not_placed = [i for i in all_puzzles if i not in placed]
-    drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
+    drawed_puzzles = {i: draw_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
 
     # show first board
     main_show, unused_show = start_showing(board_to_solve, drawed_puzzles)
     solve(board_to_solve, puzzles_to_place, 0, pause, main_show, unused_show)
-    print(type(main_show), type(unused_show))
 
     plt.show()
 

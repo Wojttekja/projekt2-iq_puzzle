@@ -4,7 +4,7 @@ from itertools import chain
 import argparse
 import numpy as np
 from main import read_file, read_all_puzzles_from_board
-from main import draw_an_element, put_puzzle, get_all_variants
+from main import draw_element, put_puzzle, get_all_variants
 
 start = datetime.now()
 
@@ -41,7 +41,7 @@ def main():
     all_puzzles = read_all_puzzles_from_board(solved_board)
     placed = set(list(chain(*board_to_solve.tolist())))
     not_placed = [i for i in all_puzzles if i not in placed]
-    drawed_puzzles = {i: draw_an_element(i, solved_board) for i in not_placed}
+    drawed_puzzles = {i: draw_element(i, solved_board) for i in not_placed}
     puzzles_to_place = list(drawed_puzzles.values())
 
     print(solve_without_showing(board_to_solve, puzzles_to_place, 0))
