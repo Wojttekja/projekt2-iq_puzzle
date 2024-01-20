@@ -136,11 +136,10 @@ def main():
     not_placed = [i for i in all_puzzles if i not in placed]
     drawed_puzzles = {i: draw_element(i, solved_board) for i in not_placed}
 
-    # print(get_all_variants(drawed_puzzles[7]))
-    
     # show first board
     main_show, unused_show = start_showing(board_to_solve, drawed_puzzles)
-    solve(board_to_solve, [get_all_variants(i) for i in drawed_puzzles.values()], 0, pause, main_show, unused_show)
+    solve(board_to_solve, [get_all_variants(i) for i in drawed_puzzles.values()],
+          0, pause, main_show, unused_show)
 
     plt.show()
 
