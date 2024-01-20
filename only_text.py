@@ -10,7 +10,7 @@ start = datetime.now()
 
 def solve_without_showing(board_to_solve: np.ndarray,
                           puzzles: [[np.ndarray]], current_puzzle: int) -> np.ndarray:
-    """solves puzzle recursively"""
+    """Solves puzzle recursively"""
     if len(puzzles) == current_puzzle:
         return board_to_solve
     height, width = board_to_solve.shape

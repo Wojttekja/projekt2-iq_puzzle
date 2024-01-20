@@ -21,7 +21,7 @@ def read_all_puzzles_from_board(board: np.ndarray) -> list:
     return set(list(chain(*temp)))
 
 def draw_element(element: int, board: np.ndarray) -> np.ndarray:
-    """Draws a small numpy array including only specific element"""
+    """Draws a small numpy array including only specified puzzle"""
     row_indexes, column_indexes = np.where(board == element)
     drawed = np.zeros((max(row_indexes)-min(row_indexes)+1,
                        max(column_indexes)-min(column_indexes)+1))
@@ -31,7 +31,7 @@ def draw_element(element: int, board: np.ndarray) -> np.ndarray:
     return drawed
 
 def put_puzzle(board: np.ndarray, puzzle: np.ndarray, place: (int, int)) -> bool or np.ndarray:
-    """places a puzzle into board on specified location or return False if it doesn't fit"""
+    """Places a puzzle into board on specified location or return False if it doesn't fit"""
     new_board = board.copy()
     ys, xs = puzzle.nonzero()
     number = puzzle[ys[0], xs[0]]
@@ -45,7 +45,7 @@ def put_puzzle(board: np.ndarray, puzzle: np.ndarray, place: (int, int)) -> bool
     return new_board
 
 def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
-    """returns list of variants of given puzzle, varaints meaning roteted or fliped puzzle"""
+    """Returns list of variants of given puzzle, variants meaning rotated or fliped puzzle"""
     all_varaints = [puzzle]
     listed_variants = [puzzle.tolist()]
     for k in (-1, 1, 2):
@@ -67,7 +67,7 @@ def get_all_variants(puzzle: np.ndarray) -> [np.ndarray]:
 
 def solve(board_to_solve: np.ndarray, puzzles: [[np.ndarray]], current_puzzle: int,
           pause: float, main_show: AxesImage, unused_show: [AxesImage]) -> np.ndarray:
-    """solves puzzle recursively"""
+    """Solves puzzle recursively"""
     main_show.set_data(board_to_solve)
     for puzzle, plot, i in zip(puzzles, unused_show, range(len(puzzles))):
         if i < current_puzzle:
