@@ -12,7 +12,7 @@ Czasy ułożenia (only_text.py) poszczególnych planszy:
 - more_test_boards/plansza9elementow.txt  (9 elementów)    0:01:17.669171
 - more_test_boards/plansza10elementow.txt (10 elementów)   0:02:02.174488
 
-=====================================================================================================================
+=========================================================================================================
 
 IQ puzzle solver with vizualization using matplotlib
 Reads boards as numpy two-dimensional arrays
