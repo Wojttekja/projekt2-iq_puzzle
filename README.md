@@ -2,7 +2,7 @@ Program main.py rozwiązuje rekurencyjnie puzzle i pokazuje na bieżąco każdy 
 na wykresach z biblioteki matplotlib. Zarówno plansza jak i elementy do użlożenia są
 przechowywane jako dwuwymiarowe tablice numpy'owe. 
 only_text.py zawiera jedynie funkcję do rozwiązywania i wyświetla tekstowo rozwiązane puzzle.
-Słuzy do testowania wydajności algorytmu bez spowolnienia spowodowanego wyświetlaniem krok po kroku 
+Służy do testowania wydajności algorytmu bez spowolnienia spowodowanego wyświetlaniem krok po kroku 
 procesu układania. 
 Czasy ułożenia (only_text.py) poszczególnych planszy:
 - plansza2.txt                            (3 elementy)     0:00:00.006053
